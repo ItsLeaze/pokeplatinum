@@ -486,13 +486,19 @@ static void sub_02073E18(BoxPokemon *boxMon, int monSpecies, int monLevel, int m
 
 void sub_02074044(Pokemon *mon, u16 monSpecies, u8 monLevel, u8 monIVs, u8 monNature)
 {
+    u32 monPersonality = getPersonalityForNature(monNature);
+    Pokemon_InitWith(mon, monSpecies, monLevel, monIVs, TRUE, monPersonality, OTID_NOT_SET, 0);
+}
+
+u32 getPersonalityForNature(u8 monNature)
+{
     u32 monPersonality;
 
     do {
         monPersonality = (LCRNG_Next() | (LCRNG_Next() << 16));
     } while (monNature != Pokemon_GetNatureOf(monPersonality));
 
-    Pokemon_InitWith(mon, monSpecies, monLevel, monIVs, TRUE, monPersonality, OTID_NOT_SET, 0);
+    return monPersonality;
 }
 
 void sub_02074088(Pokemon *mon, u16 monSpecies, u8 monLevel, u8 monIVs, u8 gender, u8 param5, u8 param6)

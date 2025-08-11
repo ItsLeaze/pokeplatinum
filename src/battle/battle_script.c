@@ -3863,7 +3863,7 @@ static BOOL BtlCmd_PrintTrainerMessage(BattleSystem *battleSys, BattleContext *b
 static u32 BattleScript_CalcPrizeMoney(BattleSystem *battleSys, BattleContext *battleCtx, int battler)
 {
     u8 lastLevel = 0;
-    void *rawParty = Heap_AllocFromHeap(HEAP_ID_BATTLE, sizeof(TrainerMonWithMovesAndItem) * MAX_PARTY_SIZE);
+    void *rawParty = Heap_AllocFromHeap(HEAP_ID_BATTLE, sizeof(TrainerMonWithMoves) * MAX_PARTY_SIZE);
 
     Trainer trainer;
     Trainer_Load(battleSys->trainerIDs[battler], &trainer);
@@ -3879,18 +3879,6 @@ static u32 BattleScript_CalcPrizeMoney(BattleSystem *battleSys, BattleContext *b
 
     case TRDATATYPE_WITH_MOVES: {
         TrainerMonWithMoves *party = (TrainerMonWithMoves *)rawParty;
-        lastLevel = party[trainer.header.partySize - 1].level;
-        break;
-    }
-
-    case TRDATATYPE_WITH_ITEM: {
-        TrainerMonWithItem *party = (TrainerMonWithItem *)rawParty;
-        lastLevel = party[trainer.header.partySize - 1].level;
-        break;
-    }
-
-    case TRDATATYPE_WITH_MOVES_AND_ITEM: {
-        TrainerMonWithMovesAndItem *party = (TrainerMonWithMovesAndItem *)rawParty;
         lastLevel = party[trainer.header.partySize - 1].level;
         break;
     }

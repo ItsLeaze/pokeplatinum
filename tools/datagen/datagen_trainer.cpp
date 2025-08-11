@@ -31,6 +31,7 @@
 #include "constants/battle.h"
 #include "generated/items.h"
 #include "generated/moves.h"
+#include "generated/natures.h"
 #include "generated/species.h"
 #include "generated/trainer_classes.h"
 
@@ -38,8 +39,6 @@
 
 static void PackImmediately(const rapidjson::Value &member, TrainerMonBase &base, unsigned char *bufp);
 static void ParseMovesAndPack(const rapidjson::Value &member, TrainerMonBase &base, unsigned char *bufp);
-static void ParseItemAndPack(const rapidjson::Value &member, TrainerMonBase &base, unsigned char *bufp);
-static void ParseMovesAndItemAndPack(const rapidjson::Value &member, TrainerMonBase &base, unsigned char *bufp);
 
 typedef std::function<void(const rapidjson::Value &member, TrainerMonBase &base, unsigned char *bufp)> TrainerMonSubparser;
 
@@ -51,8 +50,6 @@ struct TrainerDataTypeTable {
 static TrainerDataTypeTable sTrainerDataTypeTable[] = {
     { PackImmediately, sizeof(TrainerMonBase) },
     { ParseMovesAndPack, sizeof(TrainerMonWithMoves) },
-    { ParseItemAndPack, sizeof(TrainerMonWithItem) },
-    { ParseMovesAndItemAndPack, sizeof(TrainerMonWithMovesAndItem) },
 };
 
 static void Usage(std::ostream &ostr)
@@ -68,7 +65,7 @@ static void Usage(std::ostream &ostr)
 static inline bool AnyMemberHasValue(const rapidjson::Value &party, const char *key)
 {
     for (const auto &member : party.GetArray()) {
-        if (!member[key].IsNull()) {
+        if (member.HasMember(key) && !member[key].IsNull()) {
             return true;
         }
     }
@@ -95,15 +92,8 @@ static TrainerHeader ParseTrainerData(const rapidjson::Document &doc)
     const rapidjson::Value &party = doc["party"];
     trdata.partySize = party.GetArray().Size();
 
-    bool partyItems = AnyMemberHasValue(party, "item");
     bool partyMoves = AnyMemberHasValue(party, "moves");
-    if (partyItems) {
-        if (partyMoves) {
-            trdata.monDataType = TRDATATYPE_WITH_MOVES_AND_ITEM;
-        } else {
-            trdata.monDataType = TRDATATYPE_WITH_ITEM;
-        }
-    } else if (partyMoves) {
+    if (partyMoves) {
         trdata.monDataType = TRDATATYPE_WITH_MOVES;
     } else {
         trdata.monDataType = TRDATATYPE_BASE;
@@ -124,6 +114,8 @@ static void ParseMovesAndPack(const rapidjson::Value &member, TrainerMonBase &ba
     withMoves.level = base.level;
     withMoves.species = base.species;
     withMoves.cbSeal = base.cbSeal;
+    withMoves.item = base.item;
+    withMoves.nature = base.nature;
 
     int i = 0;
     for (const auto &move : member["moves"].GetArray()) {
@@ -131,37 +123,6 @@ static void ParseMovesAndPack(const rapidjson::Value &member, TrainerMonBase &ba
     }
 
     memcpy(bufp, &withMoves, sizeof(withMoves));
-}
-
-static void ParseItemAndPack(const rapidjson::Value &member, TrainerMonBase &base, unsigned char *bufp)
-{
-    TrainerMonWithItem withItem = {};
-    withItem.dv = base.dv;
-    withItem.level = base.level;
-    withItem.species = base.species;
-    withItem.cbSeal = base.cbSeal;
-
-    withItem.item = LookupConst(member["item"].GetString(), Item);
-
-    memcpy(bufp, &withItem, sizeof(withItem));
-}
-
-static void ParseMovesAndItemAndPack(const rapidjson::Value &member, TrainerMonBase &base, unsigned char *bufp)
-{
-    TrainerMonWithMovesAndItem withMovesAndItem = {};
-    withMovesAndItem.dv = base.dv;
-    withMovesAndItem.level = base.level;
-    withMovesAndItem.species = base.species;
-    withMovesAndItem.cbSeal = base.cbSeal;
-
-    int i = 0;
-    for (const auto &move : member["moves"].GetArray()) {
-        withMovesAndItem.moves[i++] = LookupConst(move.GetString(), Move);
-    }
-
-    withMovesAndItem.item = LookupConst(member["item"].GetString(), Item);
-
-    memcpy(bufp, &withMovesAndItem, sizeof(withMovesAndItem));
 }
 
 static void ParseAndPackParty(const rapidjson::Document &doc, TrainerDataType monDataType, std::size_t partySize, vfs_pack_ctx *trpokeVFS)
@@ -187,6 +148,16 @@ static void ParseAndPackParty(const rapidjson::Document &doc, TrainerDataType mo
         base.species = LookupConst(member["species"].GetString(), Species);
         base.species |= (member["form"].GetUint() << TRAINER_MON_FORM_SHIFT);
         base.cbSeal = member["ball_seal"].GetUint();
+        if (member.HasMember("item") && !member["item"].IsNull()) {
+            base.item = LookupConst(member["item"].GetString(), Item);
+        } else {
+            base.item = ITEM_NONE;
+        }
+        if (member.HasMember("nature") && !member["nature"].IsNull()) {
+            base.nature = LookupConst(member["nature"].GetString(), Nature);
+        } else {
+            base.nature = NATURE_HARDY;
+        }
 
         subparser(member, base, partyBufp);
         partyBufp += monSize;
