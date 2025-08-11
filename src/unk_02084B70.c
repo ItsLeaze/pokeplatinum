@@ -1120,10 +1120,6 @@ static void TeachMove(GameWindowLayout *windowLayout, Pokemon *mon, u32 moveSlot
     Pokemon_SetValue(mon, MON_DATA_MOVE1_CUR_PP + moveSlot, &tempVar);
 
     if (windowLayout->partyManagementData->usedItemID != 0) {
-        if (Item_IsHMMove(windowLayout->partyManagementData->learnedMove) == FALSE) {
-            Bag_TryRemoveItem(windowLayout->partyManagementData->bag, windowLayout->partyManagementData->usedItemID, 1, HEAP_ID_12);
-        }
-
         Pokemon_UpdateFriendship(mon, 4, (u16)GetCurrentMapLabel(windowLayout));
     }
 }
