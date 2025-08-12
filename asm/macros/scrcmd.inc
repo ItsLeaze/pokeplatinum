@@ -4788,6 +4788,11 @@
     .byte \arg1
     .endm
 
+    .macro FindFirstPartySlotWithMon destVar
+    .short 840
+    .short \destVar
+    .endm
+
 
 
     .macro GoToIfLt varID, valueOrVarID, offset
