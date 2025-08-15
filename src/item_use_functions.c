@@ -314,7 +314,7 @@ static void UseHealingItemFromMenu(ItemMenuUseContext *usageContext, const ItemU
     partyMan->usedItemID = usageContext->item;
     partyMan->selectedMonSlot = usageContext->selectedMonSlot;
 
-    FieldSystem_StartChildProcess(fieldSystem, &Unk_020F1E88, partyMan);
+    FieldSystem_StartChildProcess(fieldSystem, &gPokemonPartyAppTemplate, partyMan);
     menu->taskData = partyMan;
     sub_0203B674(menu, sub_0203B7C0);
 }
@@ -548,7 +548,7 @@ static void UseTMHMFromMenu(ItemMenuUseContext *usageContext, const ItemUseConte
     partyMan->selectedMonSlot = usageContext->selectedMonSlot;
     partyMan->learnedMove = Item_MoveForTMHM(usageContext->item);
 
-    FieldSystem_StartChildProcess(fieldSystem, &Unk_020F1E88, partyMan);
+    FieldSystem_StartChildProcess(fieldSystem, &gPokemonPartyAppTemplate, partyMan);
     menu->taskData = partyMan;
     sub_0203B674(menu, sub_0203B7C0);
 }
@@ -924,7 +924,7 @@ static void UseEvoStoneFromMenu(ItemMenuUseContext *usageContext, const ItemUseC
     partyMan->usedItemID = usageContext->item;
     partyMan->selectedMonSlot = usageContext->selectedMonSlot;
 
-    FieldSystem_StartChildProcess(fieldSystem, &Unk_020F1E88, partyMan);
+    FieldSystem_StartChildProcess(fieldSystem, &gPokemonPartyAppTemplate, partyMan);
     menu->taskData = partyMan;
     sub_0203B674(menu, sub_0203B7C0);
 }
