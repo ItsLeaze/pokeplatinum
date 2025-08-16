@@ -440,7 +440,7 @@
 	</row>
 	<row id="PokemonSummary_Text_PageTitleSkills" index="109">
 		<attribute name="window_context_name">used</attribute>
-		<language name="English">POKéMON SKILLS</language>
+		<language name="English">POKéMON STATS/IV</language>
 	</row>
 	<row id="PokemonSummary_Text_LabelHp" index="110">
 		<attribute name="window_context_name">used</attribute>

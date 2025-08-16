@@ -22,4 +22,6 @@ TMs no longer disappear after using them.
 ## 7 Remove necessity for Pokemon having HM moves for field effects
 Instead, a the player can always perform field moves, no matter the Party.
 
-
+## 8 Add IV display in summary and mark nature affinities in stats
+In the stats page of a Pokemon's summary, you can now press A to toggle between stats and IVs.
+Stats decreased by the nature are also marked red, increased stats are marked blue.
